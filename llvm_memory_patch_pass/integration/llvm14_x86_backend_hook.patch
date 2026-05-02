@@ -1,0 +1,26 @@
+diff --git a/llvm/lib/Target/X86/CMakeLists.txt b/llvm/lib/Target/X86/CMakeLists.txt
+--- a/llvm/lib/Target/X86/CMakeLists.txt
++++ b/llvm/lib/Target/X86/CMakeLists.txt
+@@
++  X86SelectedStorePatch.cpp
+
+diff --git a/llvm/lib/Target/X86/X86.h b/llvm/lib/Target/X86/X86.h
+--- a/llvm/lib/Target/X86/X86.h
++++ b/llvm/lib/Target/X86/X86.h
+@@
++FunctionPass *createX86CipherMemdefSelectedStorePass();
++void initializeX86CipherMemdefSelectedStorePassPass(PassRegistry &);
+
+diff --git a/llvm/lib/Target/X86/X86TargetMachine.cpp b/llvm/lib/Target/X86/X86TargetMachine.cpp
+--- a/llvm/lib/Target/X86/X86TargetMachine.cpp
++++ b/llvm/lib/Target/X86/X86TargetMachine.cpp
+@@
++  initializeX86CipherMemdefSelectedStorePassPass(PR);
+@@
+ void X86PassConfig::addPostRegAlloc() {
+   addPass(createX86LowerTileCopyPass());
+   addPass(createX86FloatingPointStackifierPass());
++  addPass(createX86CipherMemdefSelectedStorePass());
+   if (getOptLevel() != CodeGenOpt::None)
+     addPass(createX86LoadValueInjectionLoadHardeningPass());
+ }

@@ -1,33 +1,54 @@
-# Artifact Overview
+# Ciphertext-Trace Defense Artifact
 
-This artifact contains a minimal code-only snapshot for the paper. It is
-organized by experiment component and excludes raw datasets, model checkpoints,
-raw traces, generated binaries, and experiment results.
+This repository contains the core code for evaluating ciphertext-trace defenses
+for neural-network inference.
 
-## Layout
+## Components
 
-- `attack_evaluation_self/ciphersteal/`: code used for the CipherSteal-style
-  trace collection, execution-matrix runs, and collision/leakage analysis.
-- `attack_evaluation_self/hypertheft/`: code used for the HyperTheft-style
-  attack evaluation, mismatch-trace experiments, local model modules, and latent
-  analysis.
-- `modified_framework_files/glow/`: Glow source files modified for the defense
-  and trace-collection experiments.
-- `modified_framework_files/tvm/`: TVM source files modified for the defense
-  and trace-collection experiments.
-- `leakage_analysis/`: standalone collision and higher-order trace-analysis
-  scripts.
-- `trace_collection/`: trace-collection and execution-matrix helper scripts.
+`llvm_memory_patch_pass/` implements the defense.  The protected object is a
+concrete selected memory store; function names and operator patterns are only
+selectors for locating stores.
 
-## Placeholders
+`benchmark_comp/` evaluates accuracy and overhead with externally prepared
+benchmark executables or transformed bundles.  It includes the generic benchmark
+server wrapper and optional adapters for external baselines.
 
-Local machine paths have been anonymized. Paths beginning with `/path/to/...`
-are placeholders and should be replaced with the corresponding local workspace,
-dataset, Glow, TVM, trace, or experiment directory before running scripts.
+`utility_test/` is a smaller accuracy/overhead helper for the four backend
+classes used in the artifact: Glow bundle, Glow image-classifier, TVM VM, and
+TVM AOT.
 
-## Excluded Files
+`mem_trace_pintool/` collects ciphertext write traces.  Generated trace binaries
+and IP maps are outputs, not source files.
 
-The artifact intentionally excludes datasets, private traces, model weights,
-checkpoints, generated logs, generated tables, figures, compiled libraries, and
-other bulky or sensitive outputs. These files should be regenerated locally or
-obtained through the proper dataset/model channels when needed.
+`trace_leakage_R/` analyzes collected traces.  It contains pattern-leakage
+analysis and adjacent-change leakage analysis.
+
+`trace_to_image_pip/` evaluates trace-to-image recovery.  It supports T-only and
+T+I evaluation.  T+I testing requires a GAN prior and positive projection steps.
+
+`trace_to_label_pip/` evaluates trace-to-label attacks from prepared tensor
+corpora.
+
+`trace_to_func_pip/` evaluates the trace-to-function / hypernetwork attack from
+prepared task corpora.
+
+`mismatch_baseline/` provides attack-agnostic synthetic mismatch traces.  These
+traces are used for trace-to-image mismatch recovery and trace-to-function
+mismatch evaluation.  Trace-to-label evaluation is independent and does not need
+a mismatch-specific baseline.
+
+## External Inputs
+
+Prepare these outside the repository:
+
+- datasets and prepared tensor corpora;
+- victim models, generated bundles, and benchmark executables;
+- attack checkpoints and optional GAN checkpoints;
+- off/on trace directories and pair lists;
+- benchmark manifests and local run configurations.
+
+## Outputs
+
+Typical generated outputs include accuracy summaries, overhead summaries,
+leakage metrics, recovered images, attack metrics, and mismatch baseline
+summaries.

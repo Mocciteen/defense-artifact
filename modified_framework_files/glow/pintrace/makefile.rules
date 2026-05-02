@@ -1,2 +1,0 @@
-# Minimal rules for building the tool
-TOOL_ROOTS := paddrtrace sitebittrace taintblock16trace singleblock16trace watchaddrtrace
